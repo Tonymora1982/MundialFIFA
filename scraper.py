@@ -1,0 +1,76 @@
+import requests
+import xml.etree.ElementTree as ET
+import json
+import os
+import re
+
+# URL of the RSS feed
+RSS_URL = "https://www.20minutos.es/rss/deportes/"
+
+def clean_html(raw_html):
+    """Remove HTML tags from a string."""
+    if not raw_html:
+        return ""
+    cleanr = re.compile('<.*?>')
+    cleantext = re.sub(cleanr, '', raw_html)
+    return cleantext
+
+def scrape_news():
+    try:
+        print(f"Fetching RSS feed from {RSS_URL}...")
+        response = requests.get(RSS_URL)
+        response.raise_for_status()
+
+        # Parse XML
+        root = ET.fromstring(response.content)
+
+        news_items = []
+
+        # Iterate over items (standard RSS format: channel -> item)
+        for item in root.findall('./channel/item'):
+            title = item.find('title').text
+            description = item.find('description').text
+            pub_date = item.find('pubDate').text
+            # link = item.find('link').text # Not needed for this specific display but good to have if we expand
+
+            if description:
+                description = clean_html(description)
+            else:
+                description = "Sin descripción disponible."
+
+            # Clean up title if needed (sometimes CDATA)
+            if title:
+                title = title.strip()
+
+            # Simple date formatting if possible, or just keep as string
+            # 20minutos format: Sat, 22 Nov 2025 13:28:21 +0100
+
+            news_items.append({
+                "title": title,
+                "content": description,
+                "date": pub_date
+            })
+
+            # Limit to top 6 news
+            if len(news_items) >= 6:
+                break
+
+        # Generate news_data.js
+        js_content = f"const scrapedNews = {json.dumps(news_items, ensure_ascii=False, indent=4)};"
+
+        with open('news_data.js', 'w', encoding='utf-8') as f:
+            f.write(js_content)
+
+        print(f"Successfully scraped {len(news_items)} news items to news_data.js")
+
+    except Exception as e:
+        print(f"Error scraping news: {e}")
+        # Create a fallback file if scraping fails
+        fallback_news = [
+            {"title": "Error al cargar noticias", "content": "No se pudieron obtener las noticias en tiempo real.", "date": "Hoy"}
+        ]
+        with open('news_data.js', 'w', encoding='utf-8') as f:
+            f.write(f"const scrapedNews = {json.dumps(fallback_news, ensure_ascii=False)};")
+
+if __name__ == "__main__":
+    scrape_news()

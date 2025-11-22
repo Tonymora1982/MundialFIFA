@@ -44,11 +44,16 @@ const bracketData = {
     ]
 };
 
-const dailyNews = [
+let dailyNews = [
     { title: "Sedes Anunciadas", date: "Hoy", content: "La FIFA ha confirmado los estadios para la gran final del 2026. Nueva York/Nueva Jersey será el escenario principal." },
     { title: "Mbappé en Duda", date: "Hace 2 horas", content: "El capitán francés sufre una molestia en el entrenamiento y es duda para el debut contra México." },
     { title: "Récord de Entradas", date: "Ayer", content: "Se han agotado todas las entradas para la fase de grupos en tiempo récord. El entusiasmo es total." }
 ];
+
+// Check if scraped news exists
+if (typeof scrapedNews !== 'undefined' && scrapedNews.length > 0) {
+    dailyNews = scrapedNews;
+}
 
 function renderCountdown() {
     const targetDate = new Date("June 11, 2026 00:00:00").getTime();
