@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mundial FIFA 2026 - En Vivo</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Bebas+Neue&family=Manrope:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="noise-overlay"></div>
+
+    <section class="hero">
+        <div class="hero-content">
+            <p class="overline">CENTRO DE DATOS OFICIAL</p>
+            <h1 class="mega-title">MUNDIAL<br><span class="text-stroke">FIFA 2026</span></h1>
+
+            <div id="countdown-container" class="hero-countdown">
+                <div class="countdown-item">
+                    <span id="days">00</span>
+                    <span class="label">DÍAS</span>
+                </div>
+                <div class="countdown-separator">:</div>
+                <div class="countdown-item">
+                    <span id="hours">00</span>
+                    <span class="label">HRS</span>
+                </div>
+                <div class="countdown-separator">:</div>
+                <div class="countdown-item">
+                    <span id="minutes">00</span>
+                    <span class="label">MIN</span>
+                </div>
+                <div class="countdown-separator">:</div>
+                <div class="countdown-item">
+                    <span id="seconds">00</span>
+                    <span class="label">SEG</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <main>
+        <section id="daily-news" class="bento-section">
+            <h2 class="section-title">ÚLTIMAS NOTICIAS <span class="dot">.</span></h2>
+            <div id="news-container" class="bento-grid">
+                <!-- Noticias se insertarán aquí -->
+            </div>
+        </section>
+
+        <section id="live-matches">
+            <h2>Partidos en Vivo</h2>
+            <div id="live-matches-container" class="matches-grid">
+                <!-- Partidos en vivo se insertarán aquí -->
+            </div>
+        </section>
+
+        <section id="groups">
+            <h2>Fase de Grupos</h2>
+            <div id="groups-container" class="groups-grid">
+                <!-- Tablas de grupos se insertarán aquí -->
+            </div>
+        </section>
+
+        <section id="bracket">
+            <h2>Fase Final (Diagrama)</h2>
+            <div class="bracket-container">
+                <div class="round round-16">
+                    <h3>Octavos</h3>
+                    <div id="r16-matches"></div>
+                </div>
+                <div class="round round-8">
+                    <h3>Cuartos</h3>
+                    <div id="r8-matches"></div>
+                </div>
+                <div class="round round-4">
+                    <h3>Semifinal</h3>
+                    <div id="r4-matches"></div>
+                </div>
+                <div class="round round-2">
+                    <h3>Final</h3>
+                    <div id="final-match"></div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 Simulación Mundial FIFA</p>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
