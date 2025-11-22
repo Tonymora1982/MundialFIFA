@@ -44,6 +44,45 @@ const bracketData = {
     ]
 };
 
+const dailyNews = [
+    { title: "Sedes Anunciadas", date: "Hoy", content: "La FIFA ha confirmado los estadios para la gran final del 2026. Nueva York/Nueva Jersey será el escenario principal." },
+    { title: "Mbappé en Duda", date: "Hace 2 horas", content: "El capitán francés sufre una molestia en el entrenamiento y es duda para el debut contra México." },
+    { title: "Récord de Entradas", date: "Ayer", content: "Se han agotado todas las entradas para la fase de grupos en tiempo récord. El entusiasmo es total." }
+];
+
+function renderCountdown() {
+    const targetDate = new Date("June 11, 2026 00:00:00").getTime();
+
+    const updateTimer = () => {
+        const now = new Date().getTime();
+        const distance = targetDate - now;
+
+        const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+        document.getElementById("days").innerText = days;
+        document.getElementById("hours").innerText = String(hours).padStart(2, '0');
+        document.getElementById("minutes").innerText = String(minutes).padStart(2, '0');
+        document.getElementById("seconds").innerText = String(seconds).padStart(2, '0');
+    };
+
+    setInterval(updateTimer, 1000);
+    updateTimer();
+}
+
+function renderNews() {
+    const container = document.getElementById('news-container');
+    container.innerHTML = dailyNews.map(news => `
+        <div class="news-card">
+            <h3>${news.title}</h3>
+            <span class="date">${news.date}</span>
+            <p>${news.content}</p>
+        </div>
+    `).join('');
+}
+
 function renderGroups() {
     const container = document.getElementById('groups-container');
     container.innerHTML = '';
@@ -208,6 +247,8 @@ function updateScores() {
 
 // Init
 document.addEventListener('DOMContentLoaded', () => {
+    renderCountdown();
+    renderNews();
     renderGroups();
     renderLiveMatches();
     renderBracket();
