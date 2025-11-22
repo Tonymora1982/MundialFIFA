@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mundial FIFA 2026 - En Vivo</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Oswald:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="bg-pattern"></div>
+    <header>
+        <div class="header-content">
+            <h1><i class="fa-solid fa-trophy"></i> Mundial FIFA 2026</h1>
+            <p>CENTRO DE DATOS EN VIVO</p>
+        </div>
+    </header>
+
+    <main>
+        <section id="live-matches">
+            <h2>Partidos en Vivo</h2>
+            <div id="live-matches-container" class="matches-grid">
+                <!-- Partidos en vivo se insertarán aquí -->
+            </div>
+        </section>
+
+        <section id="groups">
+            <h2>Fase de Grupos</h2>
+            <div id="groups-container" class="groups-grid">
+                <!-- Tablas de grupos se insertarán aquí -->
+            </div>
+        </section>
+
+        <section id="bracket">
+            <h2>Fase Final (Diagrama)</h2>
+            <div class="bracket-container">
+                <div class="round round-16">
+                    <h3>Octavos</h3>
+                    <div id="r16-matches"></div>
+                </div>
+                <div class="round round-8">
+                    <h3>Cuartos</h3>
+                    <div id="r8-matches"></div>
+                </div>
+                <div class="round round-4">
+                    <h3>Semifinal</h3>
+                    <div id="r4-matches"></div>
+                </div>
+                <div class="round round-2">
+                    <h3>Final</h3>
+                    <div id="final-match"></div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 Simulación Mundial FIFA</p>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
