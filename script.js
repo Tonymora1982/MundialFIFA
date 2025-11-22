@@ -20,15 +20,45 @@ const groupsData = {
     // Add more groups as needed, keeping it simple for now
 };
 
+// --- Firebase Configuration ---
+const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_PROJECT_ID.appspot.com",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
+};
+
+let db = null;
+let useFirebase = false;
+
+// Initialize Firebase
+try {
+    // Basic check to see if config is filled
+    if (firebaseConfig.projectId !== "YOUR_PROJECT_ID") {
+        firebase.initializeApp(firebaseConfig);
+        db = firebase.firestore();
+        useFirebase = true;
+        console.log("Firebase initialized. Using Firestore for real-time data.");
+    } else {
+        console.log("Firebase config is placeholder. Using local simulation.");
+    }
+} catch (e) {
+    console.error("Error initializing Firebase:", e);
+}
+
 let liveMatches = [
     { id: 1, home: "México", away: "Francia", homeScore: 0, awayScore: 0, minute: 1, status: "LIVE" },
     { id: 2, home: "Argentina", away: "Arabia Saudita", homeScore: 1, awayScore: 2, minute: 85, status: "LIVE" }
 ];
 
-// Load state if exists
-const savedMatches = localStorage.getItem('fifa_live_matches');
-if (savedMatches) {
-    liveMatches = JSON.parse(savedMatches);
+// Load state if exists (only if not using Firebase)
+if (!useFirebase) {
+    const savedMatches = localStorage.getItem('fifa_live_matches');
+    if (savedMatches) {
+        liveMatches = JSON.parse(savedMatches);
+    }
 }
 
 const bracketData = {
@@ -53,33 +83,56 @@ const bracketData = {
 let dailyNews = [];
 
 async function fetchNews() {
-    try {
-        const response = await fetch('news.json');
-        if (!response.ok) throw new Error('Network response was not ok');
-        const data = await response.json();
-        if (data && data.length > 0) {
-            dailyNews = data;
-            renderNews();
-            // Animate new cards if they haven't been animated yet
-            anime({
-                targets: '.news-card',
-                translateY: [100, 0],
-                opacity: [0, 1],
-                delay: anime.stagger(100),
-                easing: 'easeOutExpo'
+    if (useFirebase) {
+        // Subscribe to Firestore 'news' collection
+        db.collection("news").orderBy("date", "desc").limit(6)
+            .onSnapshot((snapshot) => {
+                const newsData = [];
+                snapshot.forEach((doc) => {
+                    newsData.push(doc.data());
+                });
+
+                if (newsData.length > 0) {
+                    dailyNews = newsData;
+                    renderNews();
+                    animateNews();
+                }
+            }, (error) => {
+                console.error("Error getting news from Firestore:", error);
             });
-        }
-    } catch (error) {
-        console.log('Using default news or keeping current:', error);
-        if (dailyNews.length === 0) {
-             dailyNews = [
-                { title: "Sedes Anunciadas", date: "Hoy", content: "La FIFA ha confirmado los estadios para la gran final del 2026. Nueva York/Nueva Jersey será el escenario principal." },
-                { title: "Mbappé en Duda", date: "Hace 2 horas", content: "El capitán francés sufre una molestia en el entrenamiento y es duda para el debut contra México." },
-                { title: "Récord de Entradas", date: "Ayer", content: "Se han agotado todas las entradas para la fase de grupos en tiempo récord. El entusiasmo es total." }
-            ];
-            renderNews();
+    } else {
+        // Fallback to local JSON
+        try {
+            const response = await fetch('news.json');
+            if (!response.ok) throw new Error('Network response was not ok');
+            const data = await response.json();
+            if (data && data.length > 0) {
+                dailyNews = data;
+                renderNews();
+                animateNews();
+            }
+        } catch (error) {
+            console.log('Using default news or keeping current:', error);
+            if (dailyNews.length === 0) {
+                 dailyNews = [
+                    { title: "Sedes Anunciadas", date: "Hoy", content: "La FIFA ha confirmado los estadios para la gran final del 2026. Nueva York/Nueva Jersey será el escenario principal." },
+                    { title: "Mbappé en Duda", date: "Hace 2 horas", content: "El capitán francés sufre una molestia en el entrenamiento y es duda para el debut contra México." },
+                    { title: "Récord de Entradas", date: "Ayer", content: "Se han agotado todas las entradas para la fase de grupos en tiempo récord. El entusiasmo es total." }
+                ];
+                renderNews();
+            }
         }
     }
+}
+
+function animateNews() {
+    anime({
+        targets: '.news-card',
+        translateY: [100, 0],
+        opacity: [0, 1],
+        delay: anime.stagger(100),
+        easing: 'easeOutExpo'
+    });
 }
 
 function renderCountdown() {
@@ -299,20 +352,41 @@ function updateScores() {
     renderLiveMatches(); // This now handles diffing internally for animations
 }
 
+// Subscribe to Live Matches if using Firebase
+function subscribeToMatches() {
+    if (useFirebase) {
+        db.collection("matches").onSnapshot((snapshot) => {
+            const matches = [];
+            snapshot.forEach((doc) => {
+                matches.push({ id: doc.id, ...doc.data() });
+            });
+            // Update local state and render
+            // Note: In a real app, we might want to merge or handle diffs
+            liveMatches = matches.length > 0 ? matches : liveMatches;
+            renderLiveMatches();
+        });
+    }
+}
+
 // Init
 document.addEventListener('DOMContentLoaded', () => {
     renderCountdown();
-    fetchNews(); // Fetch real news
+    fetchNews(); // Fetch news (Firebase or Local)
     renderGroups();
-    renderLiveMatches();
+
+    if (useFirebase) {
+        subscribeToMatches(); // Real-time listener
+        renderLiveMatches(); // Initial render
+    } else {
+        renderLiveMatches();
+        // Simulate live updates every 2 seconds if NOT using Firebase
+        setInterval(updateScores, 2000);
+        // Poll for news updates every 30 seconds if NOT using Firebase (or just to refresh JSON)
+        setInterval(fetchNews, 30000);
+    }
+
     renderBracket();
 
     // Initial Animation
     animateEntry();
-
-    // Simulate live updates every 2 seconds
-    setInterval(updateScores, 2000);
-
-    // Poll for news updates every 30 seconds
-    setInterval(fetchNews, 30000);
 });

@@ -3,6 +3,14 @@ import xml.etree.ElementTree as ET
 import json
 import os
 import re
+# import firebase_admin
+# from firebase_admin import credentials
+# from firebase_admin import firestore
+
+# --- FIREBASE SETUP (UNCOMMENT TO USE) ---
+# cred = credentials.Certificate('path/to/your/serviceAccountKey.json')
+# firebase_admin.initialize_app(cred)
+# db = firestore.client()
 
 # URL of the RSS feed
 RSS_URL = "https://www.20minutos.es/rss/deportes/"
@@ -55,11 +63,25 @@ def scrape_news():
             if len(news_items) >= 6:
                 break
 
-        # Generate news.json
+        # Generate news.json (Local Backup)
         with open('news.json', 'w', encoding='utf-8') as f:
             json.dump(news_items, f, ensure_ascii=False, indent=4)
 
         print(f"Successfully scraped {len(news_items)} news items to news.json")
+
+        # --- UPLOAD TO FIREBASE (UNCOMMENT TO USE) ---
+        # if 'db' in globals():
+        #     print("Uploading to Firestore...")
+        #     batch = db.batch()
+        #     news_ref = db.collection('news')
+        #
+        #     for item in news_items:
+        #         # Use title as ID or auto-id
+        #         doc_ref = news_ref.document()
+        #         batch.set(doc_ref, item)
+        #
+        #     batch.commit()
+        #     print("Uploaded to Firestore.")
 
     except Exception as e:
         print(f"Error scraping news: {e}")
