@@ -204,31 +204,49 @@ function renderBracket() {
 }
 
 function animateEntry() {
-    // Animate Matches
+    // Hero Animation
+    anime({
+        targets: '.mega-title',
+        scale: [0.9, 1],
+        opacity: [0, 1],
+        duration: 1200,
+        easing: 'easeOutExpo'
+    });
+
+    anime({
+        targets: '.hero-countdown',
+        translateY: [50, 0],
+        opacity: [0, 1],
+        duration: 1000,
+        delay: 300,
+        easing: 'easeOutExpo'
+    });
+
+    // News Cards
+    anime({
+        targets: '.news-card',
+        translateY: [100, 0],
+        opacity: [0, 1],
+        delay: anime.stagger(100, {start: 500}),
+        easing: 'easeOutExpo'
+    });
+
+    // Matches
     anime({
         targets: '.match-card',
-        translateY: [20, 0],
+        scale: [0.8, 1],
         opacity: [0, 1],
-        delay: anime.stagger(100),
-        easing: 'easeOutQuad'
+        delay: anime.stagger(100, {start: 800}),
+        easing: 'easeOutExpo'
     });
 
-    // Animate Groups
+    // Groups
     anime({
         targets: '.group-card',
-        translateY: [20, 0],
+        translateY: [50, 0],
         opacity: [0, 1],
-        delay: anime.stagger(100, {start: 300}), // Start after matches
-        easing: 'easeOutQuad'
-    });
-
-    // Animate Bracket
-    anime({
-        targets: '.bracket-match',
-        translateX: [-20, 0],
-        opacity: [0, 1],
-        delay: anime.stagger(50, {start: 800}), // Start after groups
-        easing: 'easeOutQuad'
+        delay: anime.stagger(100, {start: 1000}),
+        easing: 'easeOutExpo'
     });
 }
 
