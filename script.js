@@ -20,10 +20,16 @@ const groupsData = {
     // Add more groups as needed, keeping it simple for now
 };
 
-const liveMatches = [
+let liveMatches = [
     { id: 1, home: "México", away: "Francia", homeScore: 0, awayScore: 0, minute: 1, status: "LIVE" },
     { id: 2, home: "Argentina", away: "Arabia Saudita", homeScore: 1, awayScore: 2, minute: 85, status: "LIVE" }
 ];
+
+// Load state if exists
+const savedMatches = localStorage.getItem('fifa_live_matches');
+if (savedMatches) {
+    liveMatches = JSON.parse(savedMatches);
+}
 
 const bracketData = {
     r16: [
@@ -44,15 +50,36 @@ const bracketData = {
     ]
 };
 
-let dailyNews = [
-    { title: "Sedes Anunciadas", date: "Hoy", content: "La FIFA ha confirmado los estadios para la gran final del 2026. Nueva York/Nueva Jersey será el escenario principal." },
-    { title: "Mbappé en Duda", date: "Hace 2 horas", content: "El capitán francés sufre una molestia en el entrenamiento y es duda para el debut contra México." },
-    { title: "Récord de Entradas", date: "Ayer", content: "Se han agotado todas las entradas para la fase de grupos en tiempo récord. El entusiasmo es total." }
-];
+let dailyNews = [];
 
-// Check if scraped news exists
-if (typeof scrapedNews !== 'undefined' && scrapedNews.length > 0) {
-    dailyNews = scrapedNews;
+async function fetchNews() {
+    try {
+        const response = await fetch('news.json');
+        if (!response.ok) throw new Error('Network response was not ok');
+        const data = await response.json();
+        if (data && data.length > 0) {
+            dailyNews = data;
+            renderNews();
+            // Animate new cards if they haven't been animated yet
+            anime({
+                targets: '.news-card',
+                translateY: [100, 0],
+                opacity: [0, 1],
+                delay: anime.stagger(100),
+                easing: 'easeOutExpo'
+            });
+        }
+    } catch (error) {
+        console.log('Using default news or keeping current:', error);
+        if (dailyNews.length === 0) {
+             dailyNews = [
+                { title: "Sedes Anunciadas", date: "Hoy", content: "La FIFA ha confirmado los estadios para la gran final del 2026. Nueva York/Nueva Jersey será el escenario principal." },
+                { title: "Mbappé en Duda", date: "Hace 2 horas", content: "El capitán francés sufre una molestia en el entrenamiento y es duda para el debut contra México." },
+                { title: "Récord de Entradas", date: "Ayer", content: "Se han agotado todas las entradas para la fase de grupos en tiempo récord. El entusiasmo es total." }
+            ];
+            renderNews();
+        }
+    }
 }
 
 function renderCountdown() {
@@ -265,13 +292,17 @@ function updateScores() {
             match.minute++;
         }
     });
+
+    // Persist state
+    localStorage.setItem('fifa_live_matches', JSON.stringify(liveMatches));
+
     renderLiveMatches(); // This now handles diffing internally for animations
 }
 
 // Init
 document.addEventListener('DOMContentLoaded', () => {
     renderCountdown();
-    renderNews();
+    fetchNews(); // Fetch real news
     renderGroups();
     renderLiveMatches();
     renderBracket();
@@ -281,4 +312,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Simulate live updates every 2 seconds
     setInterval(updateScores, 2000);
+
+    // Poll for news updates every 30 seconds
+    setInterval(fetchNews, 30000);
 });

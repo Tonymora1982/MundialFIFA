@@ -55,13 +55,11 @@ def scrape_news():
             if len(news_items) >= 6:
                 break
 
-        # Generate news_data.js
-        js_content = f"const scrapedNews = {json.dumps(news_items, ensure_ascii=False, indent=4)};"
+        # Generate news.json
+        with open('news.json', 'w', encoding='utf-8') as f:
+            json.dump(news_items, f, ensure_ascii=False, indent=4)
 
-        with open('news_data.js', 'w', encoding='utf-8') as f:
-            f.write(js_content)
-
-        print(f"Successfully scraped {len(news_items)} news items to news_data.js")
+        print(f"Successfully scraped {len(news_items)} news items to news.json")
 
     except Exception as e:
         print(f"Error scraping news: {e}")
@@ -69,8 +67,8 @@ def scrape_news():
         fallback_news = [
             {"title": "Error al cargar noticias", "content": "No se pudieron obtener las noticias en tiempo real.", "date": "Hoy"}
         ]
-        with open('news_data.js', 'w', encoding='utf-8') as f:
-            f.write(f"const scrapedNews = {json.dumps(fallback_news, ensure_ascii=False)};")
+        with open('news.json', 'w', encoding='utf-8') as f:
+            json.dump(fallback_news, f, ensure_ascii=False)
 
 if __name__ == "__main__":
     scrape_news()
